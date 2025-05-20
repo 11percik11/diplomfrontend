@@ -123,7 +123,7 @@ localStorage.setItem("pendingOrder", JSON.stringify(selectedItems));
       if (data.confirmation && data.confirmation.confirmation_token) {
         const checkout = new (window as any).YooMoneyCheckoutWidget({
           confirmation_token: data.confirmation.confirmation_token,
-          return_url: "http://localhost:5173/payment-complete",
+          return_url: `${BASE_URL}/payment-complete`,
 
           onComplete: function () {
             handleSuccessfulPayment()

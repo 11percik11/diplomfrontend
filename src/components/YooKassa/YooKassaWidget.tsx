@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { BASE_URL } from "../../constants";
 
 interface YooKassaWidgetProps {
   confirmationToken: string;
@@ -15,7 +16,7 @@ export const YooKassaWidget: React.FC<YooKassaWidgetProps> = ({ confirmationToke
     if (window.YooMoneyCheckoutWidget) {
       const checkout = new window.YooMoneyCheckoutWidget({
         confirmation_token: confirmationToken,
-        return_url: "http://localhost:3000/payment-complete",
+        return_url: `${BASE_URL}/payment-complete`,
         error_callback: (error: any) => {
           console.error("YooKassa error:", error);
         },
