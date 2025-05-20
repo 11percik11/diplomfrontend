@@ -80,7 +80,6 @@ const LoginForm: React.FC = () => {
           </div>
         </form>
         <button type="button" className={styles.buttonAlt} onClick={handleRegister}>Зарегистрироваться</button>
-        <button type="button" className={styles.buttonAlt} onClick={() => navigate('/')}>Главная</button>
       </div>
     </div>
   );

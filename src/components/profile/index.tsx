@@ -61,6 +61,15 @@ const Profile = () => {
       <div className={styles.container}>
         <div className={styles.section}>
           <div className={styles.sectionBox}>
+            <div className={styles.dsf}>
+              <div className={styles.faPen}>
+                <FaPen className={styles.pen} onClick={openModal} />
+              </div>
+              <div className={styles.CiSettings} onClick={hadleLogout}>
+                <FiLogOut className={styles.CiSettingsSvg} />
+                <div className={styles.SvgMarg}>Выход</div>
+              </div>
+            </div>
             <div className={styles.imageContainer}>
               <img src={`${BASE_URL}${finalData?.avatarUrl}`} alt="Product" />
             </div>
@@ -69,28 +78,25 @@ const Profile = () => {
               <p>{finalData?.email}</p>
               <p>{finalData?.phone}</p>
             </div>
-            <div>
-              <FaPen className={styles.pen} onClick={openModal} />
-            </div>
           </div>
           <hr />
-          <div>
-            <div className={styles.CiSettings} onClick={hadleLogout}>
-              <FiLogOut className={styles.CiSettingsSvg} />
-              <div className={styles.SvgMarg}>Log Out</div>
-            </div>
-          </div>
-        <div className={styles.buttonGroup}>
-          <button onClick={Cart}>Корзина товара</button>
-          {(dataUser.role === "ADMIN" || dataUser.role === "MANAGER") && (
-            <button onClick={myProduct}>Мой товар</button>
-          )}
-          {(dataUser.role === "ADMIN") && (
-            <button onClick={() => navigate('/adminpanel')}>Админ панель</button>
-          )}
-        </div>
-        </div>
 
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={Cart}>Корзина товара</button>
+            <button className={styles.button} onClick={() => navigate("/orders")}>Мои заказы</button>
+            {(dataUser.role === "ADMIN" || dataUser.role === "MANAGER") && (
+              <button className={styles.button} onClick={myProduct}>Мой товар</button>
+            )}
+            {(dataUser.role === "ADMIN" || dataUser.role === "MANAGER") && (
+              <button className={styles.button} onClick={() => navigate('/commentvisable')}>Проверка комментариев</button>
+            )}
+            {dataUser.role === "ADMIN" && (
+              <button className={styles.button} onClick={() => navigate("/adminpanel")}>
+                Админ панель
+              </button>
+            )}
+          </div>
+        </div>
       </div>
       {isModalOpen && (
         <EditProfileModal

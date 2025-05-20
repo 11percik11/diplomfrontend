@@ -125,7 +125,7 @@ export default function Admin() {
             {errors.password && <div className={styles.error}>{errors.password}</div>}
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="adminpassword">Имя</label>
+            <label htmlFor="adminpassword">Секретный пароль</label>
             <input
               type="text"
               id="adminpassword"
@@ -136,7 +136,7 @@ export default function Admin() {
             />
           </div>
           <div className={styles.formGroup}>
-            <button type="submit">Зарегистрироваться</button>
+            <button className={styles.submitButton} type="submit">Зарегистрироваться</button>
           </div>
         </form>
         <button type="button" className={styles.buttonAlt} onClick={handleLogin}>Войти</button>

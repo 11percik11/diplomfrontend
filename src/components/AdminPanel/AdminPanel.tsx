@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useGetAllUserQuery } from "../../app/userApi"
-import { useGetAllProductQuery } from "../../app/productApi"
+// import { useGetAllProductQuery } from "../../app/productApi"
 import { useAllCommentMutation } from "../../app/commentsApi"
 import styles from "./AdminPanel.module.css"
 import { ActionsMenu } from "../ActionsMenu/ActionsMenu"
@@ -10,17 +10,30 @@ import DeleteProductModal from "../DeleteProductModal/DeleteProductModal"
 import DeleteCommentModal from "../DeleteCommentModal/DeleteCommentModal"
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal"
 import EditUserModal from "../EditUserModal/EditUserModal"
+import { useGetAllProductQuery } from "../../app/productApi"
+import { useGetAllOrdersQuery } from "../../app/orders"
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState<"users" | "products" | "comments">(
-    "users",
-  )
+  const [activeTab, setActiveTab] = useState<
+    "users" | "products" | "comments" | "orders"
+  >("users")
+  
+
   const [inputProductId, setInputProductId] = useState("")
 
   // Добавляем refetch для пользователей и продуктов
-  const { data: users = [], isLoading: isUsersLoading, refetch: refetchUsers } = useGetAllUserQuery()
-  const { data: products = [], isLoading: isProductsLoading, refetch: refetchProducts } = useGetAllProductQuery()
-  const [fetchComments, { data: comments = [], isLoading: isCommentsLoading }] = useAllCommentMutation()
+  const {
+    data: users = [],
+    isLoading: isUsersLoading,
+    refetch: refetchUsers,
+  } = useGetAllUserQuery()
+  const {
+    data: products = [],
+    isLoading: isProductsLoading,
+    refetch: refetchProducts,
+  } = useGetAllProductQuery({})
+  const [fetchComments, { data: comments = [], isLoading: isCommentsLoading }] =
+    useAllCommentMutation()
 
   const [editingProductId, setEditingProductId] = useState<string | null>(null)
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null)
@@ -32,11 +45,9 @@ const AdminPanel = () => {
 
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null)
-  
-  console.log("Users data:", users); 
-  const editingUser = users.find(
-    (user: any) => user.id === editingUserId,
-  )
+
+  console.log("Users data:", users)
+  const editingUser = users.find((user: any) => user.id === editingUserId)
 
   // Эффект для автоматического обновления данных при изменении активной вкладки
   useEffect(() => {
@@ -48,9 +59,12 @@ const AdminPanel = () => {
     // Если активна вкладка комментариев, не делаем автоматического обновления
   }, [activeTab, refetchUsers, refetchProducts])
 
-  const handleTabChange = (tab: "users" | "products" | "comments") => {
+  const handleTabChange = (tab: "users" | "products" | "comments" | "orders") => {
     setActiveTab(tab)
   }
+
+  const { data: orders = [], isLoading: isOrdersLoading } =
+    useGetAllOrdersQuery()
 
   const handleFetchComments = () => {
     if (inputProductId.trim()) {
@@ -107,6 +121,12 @@ const AdminPanel = () => {
         >
           Комментарии
         </button>
+        <button
+          className={`${styles.tab} ${activeTab === "orders" ? styles.active : ""}`}
+          onClick={() => handleTabChange("orders")}
+        >
+          Заказы
+        </button>
       </div>
       <div className={styles.tabContent}>
         {activeTab === "users" && (
@@ -125,6 +145,7 @@ const AdminPanel = () => {
                     <th>Роль</th>
                     <th>Количество продукта</th>
                     <th>Комментарии</th>
+                    <th>Статус</th>
                     <th>Действия</th>
                   </tr>
                 </thead>
@@ -138,6 +159,7 @@ const AdminPanel = () => {
                       <td>{user.role}</td>
                       <td>{user.products?.length || 0}</td>
                       <td>{user.comments?.length || 0}</td>
+                      <td>{user.isActivated ? "true" : "false"}</td>
                       <td className={styles.actionsCell}>
                         <ActionsMenu
                           id={user.id}
@@ -259,6 +281,39 @@ const AdminPanel = () => {
             )}
           </div>
         )}
+        {activeTab === "orders" && (
+          <div>
+            <h2>Заказы</h2>
+            {isOrdersLoading ? (
+              <p>Загрузка заказов...</p>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Пользователь</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th>Дата</th>
+                    <th>Кол-во товаров</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map(order => (
+                    <tr key={order.id}>
+                      <td>{order.id}</td>
+                      <td>{order.user?.name || "—"}</td>
+                      <td>{order.totalPrice} ₽</td>
+                      <td>{order.status}</td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>{order.items.length}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
       {editingProductId && (
         <div className={styles.modelEdit}>
@@ -294,10 +349,7 @@ const AdminPanel = () => {
       )}
       {editingUserId && editingUser && (
         <div className={styles.modelEdit}>
-          <EditUserModal
-            product={editingUser}
-            onClose={handleUserUpdated}
-          />
+          <EditUserModal product={editingUser} onClose={handleUserUpdated} />
         </div>
       )}
     </div>
